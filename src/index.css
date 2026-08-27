@@ -1,0 +1,258 @@
+:root {
+  /* Palette "plein air" : vert forêt/menthe (mouvement, nature) + corail pour
+     les accents ponctuels. Fond légèrement teinté plutôt que blanc clinique,
+     dans l'esprit Santé/Fit sans en copier les couleurs de marque. */
+  --bg: #f7f8f5;
+  --stage-bg: #eceee7;
+  --surface: #ffffff;
+  --surface-2: #eef2ec;
+  --track: #e2e8e1;
+  --text: #182019;
+  --text-muted: #667267;
+  --border: #e2e6df;
+  --primary: #1f6f54;
+  --primary-2: #58c48c;
+  --primary-contrast: #ffffff;
+  --accent: #ff7a45;
+  --accent-bg: rgba(255, 122, 69, 0.12);
+  --danger: #c8412f;
+  --danger-bg: rgba(200, 65, 47, 0.1);
+  --shadow: 0 1px 2px rgba(24, 32, 25, 0.06), 0 8px 24px rgba(24, 32, 25, 0.06);
+  --shadow-elevated: 0 30px 60px -20px rgba(15, 20, 15, 0.35), 0 0 0 1px rgba(15, 20, 15, 0.04);
+
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  font: 16px/1.45 var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141814;
+    --stage-bg: #06070a;
+    --surface: #1b211c;
+    --surface-2: #212820;
+    --track: #2a322a;
+    --text: #edf2ea;
+    --text-muted: #8fa092;
+    --border: #262f27;
+    --primary: #4fd98c;
+    --primary-2: #1f6f54;
+    --primary-contrast: #06120c;
+    --accent: #ff8f5e;
+    --accent-bg: rgba(255, 143, 94, 0.14);
+    --danger: #ff8577;
+    --danger-bg: rgba(255, 133, 119, 0.14);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-elevated: 0 30px 60px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--stage-bg);
+}
+
+#root {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100svh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+  }
+
+  #root {
+    /* Cadre "téléphone" à taille fixe : le contenu défile à l'intérieur du
+       cadre plutôt que de s'étirer (et se faire couper par overflow:hidden). */
+    height: min(860px, calc(100svh - 80px));
+    border-radius: 32px;
+    box-shadow: var(--shadow-elevated);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+h1,
+h2 {
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+h1 {
+  font-size: 22px;
+}
+
+h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--primary);
+}
+
+/* --- Boutons partagés --- */
+
+.btn {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 13px 20px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: opacity 0.2s, border-color 0.2s, transform 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.btn--pill {
+  border-radius: 999px;
+  width: 100%;
+}
+
+.btn--primary {
+  color: var(--primary-contrast);
+  background: var(--primary);
+}
+
+.btn--primary:not(:disabled):hover {
+  opacity: 0.92;
+}
+
+.btn--ghost {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: transparent;
+}
+
+.btn--ghost:not(:disabled):hover {
+  border-color: var(--primary);
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-2);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.icon-button:hover {
+  background: var(--track);
+}
+
+.icon-button:active {
+  transform: scale(0.94);
+}
+
+.icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon-button--spin svg {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-button--spin svg {
+    animation: none;
+  }
+  .step-ring__progress {
+    transition: none;
+  }
+}
+
+/* --- Statistique clé/valeur partagée --- */
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.stat strong {
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.stat span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* --- Overrides Leaflet minimalistes --- */
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: var(--surface-2);
+  font: inherit;
+}
