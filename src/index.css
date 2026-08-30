@@ -75,10 +75,12 @@ body {
   width: 100%;
   max-width: 430px;
   margin: 0 auto;
-  min-height: 100svh;
+  height: 100dvh;
   background: var(--bg);
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
 @media (min-width: 640px) {
@@ -96,8 +98,6 @@ body {
     border-radius: 32px;
     border: 1px solid var(--border);
     box-shadow: none;
-    overflow-y: auto;
-    overflow-x: hidden;
   }
 }
 
