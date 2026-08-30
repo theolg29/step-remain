@@ -14,17 +14,17 @@ export class OrsError extends Error {
   }
 }
 
-interface GenerateRouteParams {
-  apiKey: string
+export interface GenerateRouteParams {
+  apiKey?: string
   homeLat: number
   homeLng: number
   /** Distance de la boucle visée, en mètres. */
   distanceMeters: number
-  /** Nombre de points de la boucle (4 à 6, forme plus ou moins anguleuse). */
+  /** Nombre de points de la boucle (4 à 6). */
   points?: number
   /** Change le tracé sans changer la distance visée (bouton "Régénérer"). */
   seed?: number
-  /** Génère plusieurs tracés à distance égale et garde le plus plat (voir plus bas). */
+  /** Génère plusieurs tracés à distance égale et garde le plus plat. */
   avoidHills?: boolean
 }
 
@@ -111,12 +111,14 @@ async function requestRoundTrip({
   homeLat,
   homeLng,
   distanceMeters,
-  points = 5,
+  points = 4 + Math.floor(Math.random() * 3),
   seed = Date.now(),
 }: GenerateRouteParams): Promise<RouteResult> {
-  if (!apiKey) {
+  const effectiveApiKey = (apiKey?.trim() || (import.meta.env.VITE_ORS_API_KEY as string | undefined) || '').trim()
+
+  if (!effectiveApiKey) {
     throw new OrsError(
-      "Clé API openrouteservice manquante. Renseigne-la dans les paramètres.",
+      "Clé API openrouteservice manquante. Renseigne-la dans les paramètres ou via .env.",
     )
   }
   if (!Number.isFinite(distanceMeters) || distanceMeters <= 0) {
@@ -130,7 +132,7 @@ async function requestRoundTrip({
     response = await fetch(ORS_DIRECTIONS_URL, {
       method: 'POST',
       headers: {
-        Authorization: apiKey,
+        Authorization: effectiveApiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

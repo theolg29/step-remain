@@ -8,11 +8,13 @@ import { OrsError } from '../lib/orsClient'
 import type { Settings } from '../types'
 import {
   ChevronDownIcon,
+  ChevronRightIcon,
   CloseIcon,
   EyeIcon,
   EyeOffIcon,
   PinIcon,
   SearchIcon,
+  SparklesIcon,
 } from './icons'
 import './SettingsForm.css'
 
@@ -23,9 +25,9 @@ const FALLBACK_CENTER: [number, number] = [48.8566, 2.3522]
 
 interface SettingsFormProps {
   settings: Settings
-  isOnboarding: boolean
   onSave: (settings: Settings) => void
   onCancel: () => void
+  onRestartOnboarding: () => void
 }
 
 function HomePicker({ onPick }: { onPick: (lat: number, lng: number) => void }) {
@@ -39,9 +41,9 @@ function HomePicker({ onPick }: { onPick: (lat: number, lng: number) => void }) 
 
 export default function SettingsForm({
   settings,
-  isOnboarding,
   onSave,
   onCancel,
+  onRestartOnboarding,
 }: SettingsFormProps) {
   const [heightCm, setHeightCm] = useState(settings.heightCm)
   const [orsApiKey, setOrsApiKey] = useState(settings.orsApiKey)
@@ -50,9 +52,7 @@ export default function SettingsForm({
   const [homeLat, setHomeLat] = useState(settings.homeLat)
   const [homeLng, setHomeLng] = useState(settings.homeLng)
   const [showApiKey, setShowApiKey] = useState(false)
-  // Clé et taille se règlent une fois puis se font oublier : repliées par
-  // défaut, sauf à l'onboarding où elles sont requises pour continuer.
-  const [advancedOpen, setAdvancedOpen] = useState(isOnboarding)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
   const { loading: locating, error: geoError, locate } = useGeolocation()
   const [addressQuery, setAddressQuery] = useState('')
   const [addressResults, setAddressResults] = useState<AddressResult[]>([])
@@ -60,17 +60,13 @@ export default function SettingsForm({
   const [addressError, setAddressError] = useState<string | null>(null)
   const mapRef = useRef<LeafletMap | null>(null)
 
-  // Au premier lancement, capture automatique de la position une fois.
+  const envApiKey = (import.meta.env.VITE_ORS_API_KEY as string | undefined) || ''
+
   useEffect(() => {
-    if (isOnboarding && settings.homeLat === null) {
-      locate().then((pos) => {
-        if (pos) {
-          setHomeLat(pos.lat)
-          setHomeLng(pos.lng)
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const timer = setTimeout(() => {
+      mapRef.current?.invalidateSize()
+    }, 150)
+    return () => clearTimeout(timer)
   }, [])
 
   const handleLocate = async () => {
@@ -88,7 +84,7 @@ export default function SettingsForm({
     setAddressError(null)
     setAddressResults([])
     try {
-      const results = await searchAddress(orsApiKey, addressQuery)
+      const results = await searchAddress(orsApiKey || envApiKey, addressQuery)
       if (results.length === 0) {
         setAddressError('Aucune adresse trouvée.')
       }
@@ -128,23 +124,22 @@ export default function SettingsForm({
 
   return (
     <form className="settings-screen" onSubmit={handleSubmit}>
+      <div className="settings-screen__handle-bar">
+        <div className="settings-screen__handle" />
+      </div>
       <header className="settings-screen__header">
-        <h1>{isOnboarding ? 'Bienvenue' : 'Réglages'}</h1>
-        {!isOnboarding && (
-          <button
-            type="button"
-            className="icon-button"
-            onClick={onCancel}
-            aria-label="Fermer les réglages"
-          >
-            <CloseIcon />
-          </button>
-        )}
+        <h1>Réglages</h1>
+        <button
+          type="button"
+          className="icon-button"
+          onClick={onCancel}
+          aria-label="Fermer les réglages"
+        >
+          <CloseIcon />
+        </button>
       </header>
       <p className="settings-screen__intro">
-        {isOnboarding
-          ? "Quelques infos pour calculer tes trajets, tout reste sur ton appareil."
-          : 'Tout reste enregistré sur ton appareil.'}
+        Tout reste enregistré localement sur ton appareil.
       </p>
 
       <section className="settings-group">
@@ -311,7 +306,7 @@ export default function SettingsForm({
                 type={showApiKey ? 'text' : 'password'}
                 autoComplete="off"
                 spellCheck={false}
-                placeholder="Clé API"
+                placeholder={envApiKey ? 'Configurée via .env (ou renseigner une autre clé)' : 'Clé API'}
                 value={orsApiKey}
                 onChange={(e) => setOrsApiKey(e.target.value)}
               />
@@ -324,18 +319,39 @@ export default function SettingsForm({
                 {showApiKey ? <EyeOffIcon /> : <EyeIcon />}
               </button>
             </div>
+            {envApiKey && !orsApiKey && (
+              <p className="settings-group__hint" style={{ color: 'var(--primary)', marginTop: '2px' }}>
+                ✓ Clé par défaut active via .env (2 000 requêtes/jour)
+              </p>
+            )}
           </div>
         </div>
       </details>
 
+      <section className="settings-group">
+        <h2>Aide & Découverte</h2>
+        <button
+          type="button"
+          className="settings-guide-btn"
+          onClick={onRestartOnboarding}
+        >
+          <div className="settings-guide-btn__icon">
+            <SparklesIcon />
+          </div>
+          <div className="settings-guide-btn__text">
+            <strong>Revoir le guide d'accueil</strong>
+            <span>Relancer les étapes de présentation et de configuration</span>
+          </div>
+          <ChevronRightIcon className="settings-guide-btn__chevron" />
+        </button>
+      </section>
+
       <div className="settings-screen__actions">
-        {!isOnboarding && (
-          <button type="button" className="btn btn--ghost" onClick={onCancel}>
-            Annuler
-          </button>
-        )}
+        <button type="button" className="btn btn--ghost" onClick={onCancel}>
+          Annuler
+        </button>
         <button type="submit" className="btn btn--primary btn--pill" disabled={!isValid}>
-          {isOnboarding ? 'Commencer' : 'Enregistrer'}
+          Enregistrer
         </button>
       </div>
     </form>

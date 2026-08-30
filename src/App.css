@@ -1,7 +1,57 @@
-.app {
+.app-container {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.app-container--onboarding {
+  animation: appFadeIn 0.35s ease-out;
+}
+
+@keyframes appFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --- Screens & Transitions --- */
+
+.screen {
+  width: 100%;
+}
+
+.screen--main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.36s cubic-bezier(0.32, 0.72, 0, 1),
+              opacity 0.36s cubic-bezier(0.32, 0.72, 0, 1),
+              filter 0.36s cubic-bezier(0.32, 0.72, 0, 1),
+              border-radius 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform, opacity;
+  transform-origin: top center;
+}
+
+.screen--main-receded {
+  transform: scale(0.95) translateY(12px);
+  filter: brightness(0.85);
+  opacity: 0.7;
+  border-radius: 28px;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .app-header {
@@ -9,6 +59,33 @@
   align-items: center;
   justify-content: space-between;
   padding: max(20px, env(safe-area-inset-top)) 20px 4px;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-contrast);
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button {
+  position: relative;
 }
 
 .app-header__eyebrow {
@@ -26,4 +103,59 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px 20px max(24px, env(safe-area-inset-bottom));
+}
+
+/* --- Modal Backdrop --- */
+
+.settings-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 100;
+}
+
+.settings-backdrop--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* --- Settings Modal Sheet Screen --- */
+
+.screen--settings {
+  position: absolute;
+  inset: 0;
+  top: max(24px, calc(env(safe-area-inset-top) + 8px));
+  background: var(--bg);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  box-shadow: none;
+  transform: translateY(102%);
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  will-change: transform;
+}
+
+.screen--settings-open {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen--main,
+  .screen--settings,
+  .settings-backdrop,
+  .app-container--onboarding {
+    transition: none !important;
+    animation: none !important;
+  }
 }

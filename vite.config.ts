@@ -14,8 +14,8 @@ export default defineConfig({
         short_name: 'Pas restants',
         description:
           "Calcule la distance restante pour atteindre ton objectif de pas et génère un trajet piéton réel autour de chez toi.",
-        theme_color: '#1f6f54',
-        background_color: '#141814',
+        theme_color: '#061d18',
+        background_color: '#061d18',
         display: 'standalone',
         start_url: '/',
         lang: 'fr',

@@ -6,7 +6,8 @@
   padding: 24px 20px;
   border-radius: 24px;
   background: var(--surface);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
 
 .steps-card__eyebrow {
@@ -32,7 +33,9 @@
   padding: 10px 14px;
   border-radius: 16px;
   background: var(--surface-2);
+  border: 1px solid var(--border);
   text-align: left;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .stat-input span {
@@ -55,12 +58,77 @@
   width: 100%;
 }
 
+.stat-input input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.45;
+  font-weight: 600;
+}
+
+.stat-input input::-webkit-outer-spin-button,
+.stat-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stat-input input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.stat-input:focus-within {
+  background: var(--surface);
+  border-color: var(--primary);
+}
+
 .stat-input input:focus-visible {
   outline: none;
 }
 
+/* --- Quick Steps Chips --- */
+
+.steps-card__quick-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.quick-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.quick-chip:hover {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.quick-chip:active {
+  transform: scale(0.95);
+}
+
+.quick-chip--clear {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.quick-chip--clear:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
 .steps-card .btn {
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .steps-card__hint {

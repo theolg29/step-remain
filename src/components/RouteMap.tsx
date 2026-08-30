@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react'
-import { MapContainer, Marker, Polyline, TileLayer, useMap } from 'react-leaflet'
+import { CircleMarker, MapContainer, Marker, Polyline, TileLayer, useMap } from 'react-leaflet'
 import { formatDuration } from '../lib/formatDuration'
 import { buildGoogleMapsWalkingUrl } from '../lib/googleMaps'
 import { buildGpx, shareOrDownloadGpx } from '../lib/gpx'
 import { fixLeafletDefaultIcon } from '../lib/leafletIcons'
 import { metersToSteps } from '../lib/stepLength'
 import type { RouteResult } from '../types'
-import { NavigationIcon, RefreshIcon, ShareIcon } from './icons'
+import ElevationProfile from './ElevationProfile'
+import {
+  HeartFilledIcon,
+  HeartIcon,
+  NavigationIcon,
+  RefreshIcon,
+  ShareIcon,
+} from './icons'
 import './RouteMap.css'
 
 fixLeafletDefaultIcon()
@@ -18,6 +25,8 @@ interface RouteMapProps {
   isGenerating: boolean
   error: string | null
   onRegenerate: () => void
+  isSaved?: boolean
+  onToggleSave?: () => void
 }
 
 function FitToRoute({ coordinates }: { coordinates: [number, number][] }) {
@@ -30,6 +39,8 @@ function FitToRoute({ coordinates }: { coordinates: [number, number][] }) {
   return null
 }
 
+
+
 export default function RouteMap({
   home,
   heightCm,
@@ -37,8 +48,12 @@ export default function RouteMap({
   isGenerating,
   error,
   onRegenerate,
+  isSaved = false,
+  onToggleSave,
 }: RouteMapProps) {
   const [isSharingGpx, setIsSharingGpx] = useState(false)
+  const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null)
+
   const realSteps = route ? metersToSteps(route.distanceMeters, heightCm) : 0
   const googleMapsUrl = route ? buildGoogleMapsWalkingUrl(home, route.coordinates) : null
 
@@ -46,7 +61,9 @@ export default function RouteMap({
     if (!route) return
     setIsSharingGpx(true)
     try {
-      const km = (route.distanceMeters / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 2 })
+      const km = (route.distanceMeters / 1000).toLocaleString('fr-FR', {
+        maximumFractionDigits: 2,
+      })
       const date = new Date().toISOString().slice(0, 10)
       const gpx = buildGpx(route, `Trajet pas restants – ${km} km`)
       await shareOrDownloadGpx(gpx, `pas-restants-${date}.gpx`)
@@ -54,6 +71,11 @@ export default function RouteMap({
       setIsSharingGpx(false)
     }
   }
+
+  const hoveredCoordinate =
+    route && hoveredPointIndex !== null && route.coordinates[hoveredPointIndex]
+      ? route.coordinates[hoveredPointIndex]
+      : null
 
   return (
     <section className="route-card">
@@ -70,10 +92,23 @@ export default function RouteMap({
                 positions={route.coordinates}
                 pathOptions={{ color: 'var(--primary)', weight: 4 }}
               />
+              {hoveredCoordinate && (
+                <CircleMarker
+                  center={hoveredCoordinate}
+                  radius={7}
+                  pathOptions={{
+                    fillColor: 'var(--primary)',
+                    fillOpacity: 1,
+                    color: '#061d18',
+                    weight: 2,
+                  }}
+                />
+              )}
               <FitToRoute coordinates={route.coordinates} />
             </>
           )}
         </MapContainer>
+
         {route && (
           <button
             type="button"
@@ -95,7 +130,10 @@ export default function RouteMap({
           <div className="route-card__stats">
             <div className="stat">
               <strong>
-                {(route.distanceMeters / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 2 })} km
+                {(route.distanceMeters / 1000).toLocaleString('fr-FR', {
+                  maximumFractionDigits: 2,
+                })}{' '}
+                km
               </strong>
               <span>distance réelle</span>
             </div>
@@ -109,11 +147,23 @@ export default function RouteMap({
             </div>
             <div className="stat">
               <strong>
-                +{Math.round(route.ascentMeters)} m / -{Math.round(route.descentMeters)} m
+                +{Math.round(route.ascentMeters)} m / -
+                {Math.round(route.descentMeters)} m
               </strong>
               <span>dénivelé D+ / D-</span>
             </div>
           </div>
+
+          {/* Elevation Profile chart */}
+          {route.elevations && route.elevations.length > 1 && (
+            <ElevationProfile
+              elevations={route.elevations}
+              distanceMeters={route.distanceMeters}
+              ascentMeters={route.ascentMeters}
+              descentMeters={route.descentMeters}
+              onHoverPoint={setHoveredPointIndex}
+            />
+          )}
 
           <div className="route-card__actions">
             <a
@@ -125,6 +175,23 @@ export default function RouteMap({
               <NavigationIcon />
               Démarrer
             </a>
+
+            {onToggleSave && (
+              <button
+                type="button"
+                className="icon-button icon-button--lg"
+                onClick={onToggleSave}
+                aria-label={
+                  isSaved ? 'Retirer des favoris' : 'Enregistrer ce parcours'
+                }
+                title={
+                  isSaved ? 'Retirer des favoris' : 'Enregistrer ce parcours'
+                }
+              >
+                {isSaved ? <HeartFilledIcon /> : <HeartIcon />}
+              </button>
+            )}
+
             <button
               type="button"
               className="icon-button icon-button--lg"
@@ -136,6 +203,7 @@ export default function RouteMap({
               <ShareIcon />
             </button>
           </div>
+
           <p className="route-card__gpx-hint">
             "Démarrer" guide sur Google Maps (approximatif, 9 étapes max). Pour
             suivre le tracé exact, exporte-le en GPX et importe-le dans OsmAnd,

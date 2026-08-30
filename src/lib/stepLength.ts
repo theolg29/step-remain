@@ -5,11 +5,15 @@
  */
 const STEP_LENGTH_COEFFICIENT = 0.415
 
+/** Longueur d'un pas en centimètres, à partir de la taille en cm. */
+export function cmToStepLengthCm(heightCm: number): number {
+  if (!Number.isFinite(heightCm) || heightCm <= 0) return 0
+  return heightCm * STEP_LENGTH_COEFFICIENT
+}
+
 /** Longueur d'un pas en mètres, à partir de la taille en cm. */
 export function stepLengthMeters(heightCm: number): number {
-  if (!Number.isFinite(heightCm) || heightCm <= 0) return 0
-  const stepLengthCm = heightCm * STEP_LENGTH_COEFFICIENT
-  return stepLengthCm / 100
+  return cmToStepLengthCm(heightCm) / 100
 }
 
 /** Distance parcourue (m) pour un nombre de pas donné. */

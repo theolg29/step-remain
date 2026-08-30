@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { stepsToMeters } from '../lib/stepLength'
 import LoadingDots from './LoadingDots'
 import StepRing from './StepRing'
@@ -22,16 +22,41 @@ export default function StepsForm({
   disabled,
   disabledReason,
 }: StepsFormProps) {
-  const [stepsDone, setStepsDone] = useState(0)
-  const [goal, setGoal] = useState(defaultGoal)
+  const [stepsDone, setStepsDone] = useState<number | ''>('')
+  const [goal, setGoal] = useState<number | ''>(defaultGoal)
 
-  const stepsRemaining = Math.max(goal - stepsDone, 0)
+  useEffect(() => {
+    setGoal(defaultGoal)
+  }, [defaultGoal])
+
+  const effectiveStepsDone = typeof stepsDone === 'number' ? stepsDone : 0
+  const effectiveGoal = typeof goal === 'number' ? goal : 0
+
+  const stepsRemaining = Math.max(effectiveGoal - effectiveStepsDone, 0)
   const distanceRemaining = useMemo(
     () => stepsToMeters(stepsRemaining, heightCm),
     [stepsRemaining, heightCm],
   )
-  const progress = goal > 0 ? stepsDone / goal : 0
-  const goalReached = stepsRemaining === 0 && goal > 0
+  const progress = effectiveGoal > 0 ? effectiveStepsDone / effectiveGoal : 0
+  const goalReached =
+    stepsRemaining === 0 && effectiveGoal > 0 && effectiveStepsDone >= effectiveGoal
+
+  const handleAddSteps = (increment: number) => {
+    setStepsDone((prev) => {
+      const current = typeof prev === 'number' ? prev : 0
+      return current + increment
+    })
+  }
+
+  const handleSetHalfGoal = () => {
+    if (effectiveGoal > 0) {
+      setStepsDone(Math.round(effectiveGoal / 2))
+    }
+  }
+
+  const handleClearSteps = () => {
+    setStepsDone('')
+  }
 
   return (
     <section className="steps-card">
@@ -54,8 +79,19 @@ export default function StepsForm({
             type="number"
             inputMode="numeric"
             min={0}
-            value={stepsDone}
-            onChange={(e) => setStepsDone(Math.max(Number(e.target.value), 0))}
+            placeholder="0"
+            value={stepsDone === '' ? '' : stepsDone}
+            onChange={(e) => {
+              const val = e.target.value
+              if (val === '') {
+                setStepsDone('')
+              } else {
+                const n = parseInt(val, 10)
+                if (!isNaN(n) && n >= 0) {
+                  setStepsDone(n)
+                }
+              }
+            }}
           />
         </label>
         <label className="stat-input">
@@ -64,17 +100,74 @@ export default function StepsForm({
             type="number"
             inputMode="numeric"
             min={0}
-            value={goal}
-            onChange={(e) => setGoal(Math.max(Number(e.target.value), 0))}
+            placeholder={`${defaultGoal}`}
+            value={goal === '' ? '' : goal}
+            onChange={(e) => {
+              const val = e.target.value
+              if (val === '') {
+                setGoal('')
+              } else {
+                const n = parseInt(val, 10)
+                if (!isNaN(n) && n >= 0) {
+                  setGoal(n)
+                }
+              }
+            }}
           />
         </label>
+      </div>
+
+      {/* Quick steps increment pills */}
+      <div className="steps-card__quick-row">
+        <button
+          type="button"
+          className="quick-chip"
+          onClick={() => handleAddSteps(1000)}
+          title="Ajouter 1 000 pas"
+        >
+          +1 000
+        </button>
+        <button
+          type="button"
+          className="quick-chip"
+          onClick={() => handleAddSteps(2500)}
+          title="Ajouter 2 500 pas"
+        >
+          +2 500
+        </button>
+        <button
+          type="button"
+          className="quick-chip"
+          onClick={() => handleAddSteps(5000)}
+          title="Ajouter 5 000 pas"
+        >
+          +5 000
+        </button>
+        <button
+          type="button"
+          className="quick-chip"
+          onClick={handleSetHalfGoal}
+          title="Définir à 50% de l'objectif"
+        >
+          50%
+        </button>
+        {stepsDone !== '' && stepsDone !== 0 && (
+          <button
+            type="button"
+            className="quick-chip quick-chip--clear"
+            onClick={handleClearSteps}
+            title="Effacer les pas faits"
+          >
+            Effacer
+          </button>
+        )}
       </div>
 
       {!goalReached && (
         <button
           type="button"
           className="btn btn--primary btn--pill"
-          disabled={disabled || isGenerating}
+          disabled={disabled || isGenerating || effectiveGoal <= 0 || distanceRemaining <= 0}
           onClick={() => onGenerate(distanceRemaining)}
         >
           Générer un trajet

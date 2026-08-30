@@ -2,6 +2,18 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  animation: routeCardEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes routeCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .route-card__map {
@@ -10,7 +22,8 @@
   height: 280px;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
 
 .route-card__regenerate {
@@ -19,7 +32,8 @@
   right: 12px;
   z-index: 500;
   background: var(--surface);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
 
 .route-card__stats {

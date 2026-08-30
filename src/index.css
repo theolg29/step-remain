@@ -1,29 +1,31 @@
 :root {
-  /* Palette "plein air" : vert forêt/menthe (mouvement, nature) + corail pour
-     les accents ponctuels. Fond légèrement teinté plutôt que blanc clinique,
-     dans l'esprit Santé/Fit sans en copier les couleurs de marque. */
-  --bg: #f7f8f5;
-  --stage-bg: #eceee7;
-  --surface: #ffffff;
-  --surface-2: #eef2ec;
-  --track: #e2e8e1;
-  --text: #182019;
-  --text-muted: #667267;
-  --border: #e2e6df;
-  --primary: #1f6f54;
-  --primary-2: #58c48c;
-  --primary-contrast: #ffffff;
-  --accent: #ff7a45;
-  --accent-bg: rgba(255, 122, 69, 0.12);
-  --danger: #c8412f;
-  --danger-bg: rgba(200, 65, 47, 0.1);
-  --shadow: 0 1px 2px rgba(24, 32, 25, 0.06), 0 8px 24px rgba(24, 32, 25, 0.06);
-  --shadow-elevated: 0 30px 60px -20px rgba(15, 20, 15, 0.35), 0 0 0 1px rgba(15, 20, 15, 0.04);
+  /* Palette "Trainline" : Vert Lime électrique (#7df56c) + Fond Nuit Pétrole (#061d18) */
+  --lime: #7df56c;
+  --lime-hover: #8eff7e;
+  --lime-contrast: #051b16;
 
-  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bg: #061d18;
+  --stage-bg: #020b09;
+  --surface: #0d2721;
+  --surface-2: #14352d;
+  --track: #1d463c;
+  --text: #f1fbf4;
+  --text-muted: #8ba99d;
+  --border: #1a4238;
+  --primary: #7df56c;
+  --primary-2: #5ee44e;
+  --primary-contrast: #051b16;
+  --accent: #ff965b;
+  --accent-bg: rgba(255, 150, 91, 0.15);
+  --danger: #ff6b6b;
+  --danger-bg: rgba(255, 107, 107, 0.15);
+  --shadow: none;
+  --shadow-elevated: none;
+
+  --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   font: 16px/1.45 var(--sans);
-  color-scheme: light dark;
+  color-scheme: dark;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -32,25 +34,26 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --bg: #141814;
-    --stage-bg: #06070a;
-    --surface: #1b211c;
-    --surface-2: #212820;
-    --track: #2a322a;
-    --text: #edf2ea;
-    --text-muted: #8fa092;
-    --border: #262f27;
-    --primary: #4fd98c;
-    --primary-2: #1f6f54;
-    --primary-contrast: #06120c;
-    --accent: #ff8f5e;
-    --accent-bg: rgba(255, 143, 94, 0.14);
-    --danger: #ff8577;
-    --danger-bg: rgba(255, 133, 119, 0.14);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
-    --shadow-elevated: 0 30px 60px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --bg: #f4f8f5;
+    --stage-bg: #e2ece4;
+    --surface: #ffffff;
+    --surface-2: #edf5ee;
+    --track: #d8e7da;
+    --text: #061d18;
+    --text-muted: #516d62;
+    --border: #d4e5d7;
+    --primary: #127a48;
+    --primary-2: #7df56c;
+    --primary-contrast: #ffffff;
+    --accent: #e86429;
+    --accent-bg: rgba(232, 100, 41, 0.12);
+    --danger: #d93838;
+    --danger-bg: rgba(217, 56, 56, 0.1);
+    --shadow: none;
+    --shadow-elevated: none;
+    color-scheme: light;
   }
 }
 
@@ -91,7 +94,8 @@ body {
        cadre plutôt que de s'étirer (et se faire couper par overflow:hidden). */
     height: min(860px, calc(100svh - 80px));
     border-radius: 32px;
-    box-shadow: var(--shadow-elevated);
+    border: 1px solid var(--border);
+    box-shadow: none;
     overflow-y: auto;
     overflow-x: hidden;
   }
