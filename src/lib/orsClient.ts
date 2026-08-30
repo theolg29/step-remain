@@ -1,7 +1,6 @@
 import type { RouteResult } from '../types'
 
-const ORS_DIRECTIONS_URL =
-  'https://api.openrouteservice.org/v2/directions/foot-walking/geojson'
+const ORS_DIRECTIONS_URL = '/api/directions'
 
 /** Erreur "affichable telle quelle" : message déjà en français, prêt pour l'UI. */
 export class OrsError extends Error {
@@ -90,16 +89,20 @@ async function pickFlattestCandidate(
   let flattest = baseline
 
   for (let i = 0; i < EXTRA_FLAT_CANDIDATES; i++) {
-    const candidate = await requestRoundTrip({
-      ...params,
-      distanceMeters: requestLength,
-      seed: Date.now() + i + 1, // seed différent : autre forme de boucle, même distance visée
-    })
+    try {
+      const candidate = await requestRoundTrip({
+        ...params,
+        distanceMeters: requestLength,
+        seed: Date.now() + i + 1, // seed différent : autre forme de boucle, même distance visée
+      })
 
-    const ratio = candidate.distanceMeters / target
-    const withinTolerance = ratio >= 1 - TOLERANCE && ratio <= 1 + TOLERANCE
-    if (withinTolerance && candidate.ascentMeters < flattest.ascentMeters) {
-      flattest = candidate
+      const ratio = candidate.distanceMeters / target
+      const withinTolerance = ratio >= 1 - TOLERANCE && ratio <= 1 + TOLERANCE
+      if (withinTolerance && candidate.ascentMeters < flattest.ascentMeters) {
+        flattest = candidate
+      }
+    } catch {
+      // Si un candidat échoue, on conserve le meilleur trouvé jusqu'ici
     }
   }
 
@@ -114,27 +117,24 @@ async function requestRoundTrip({
   points = 4 + Math.floor(Math.random() * 3),
   seed = Date.now(),
 }: GenerateRouteParams): Promise<RouteResult> {
-  const effectiveApiKey = (apiKey?.trim() || (import.meta.env.VITE_ORS_API_KEY as string | undefined) || '').trim()
-
-  if (!effectiveApiKey) {
-    throw new OrsError(
-      "Clé API openrouteservice manquante. Renseigne-la dans les paramètres ou via .env.",
-    )
-  }
   if (!Number.isFinite(distanceMeters) || distanceMeters <= 0) {
     throw new OrsError(
       "Distance restante nulle : l'objectif est déjà atteint, rien à générer.",
     )
   }
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  if (apiKey?.trim()) {
+    headers['x-ors-api-key'] = apiKey.trim()
+  }
+
   let response: Response
   try {
     response = await fetch(ORS_DIRECTIONS_URL, {
       method: 'POST',
-      headers: {
-        Authorization: effectiveApiKey,
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
         coordinates: [[homeLng, homeLat]],
         elevation: true,
@@ -156,19 +156,19 @@ async function requestRoundTrip({
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
       throw new OrsError(
-        'Clé API openrouteservice invalide ou non autorisée. Vérifie-la dans les paramètres.',
+        'Clé API openrouteservice invalide ou non autorisée. Vérifie ta variable ORS_API_KEY sur Vercel.',
         response.status,
       )
     }
     if (response.status === 429) {
       throw new OrsError(
-        'Quota openrouteservice dépassé pour aujourd’hui, réessaie plus tard.',
+        'Quota openrouteservice dépassé pour aujourd’hui (2 000 req/jour max), réessaie plus tard.',
         response.status,
       )
     }
     const detail = await extractErrorDetail(response)
     throw new OrsError(
-      `Erreur openrouteservice (${response.status})${detail ? ` : ${detail}` : ''}`,
+      `Erreur génération de trajet (${response.status})${detail ? ` : ${detail}` : ''}`,
       response.status,
     )
   }
@@ -201,25 +201,28 @@ async function requestRoundTrip({
 
 /**
  * Dénivelé positif/négatif cumulé (D+/D-) à partir du profil d'altitude.
- * Simple somme des écarts consécutifs, sans lissage : sur un DEM bruité, ça
- * peut légèrement surestimer un dénivelé faible — acceptable pour une estimation.
  */
 function computeElevationChange(elevations: number[]): { ascent: number; descent: number } {
   let ascent = 0
   let descent = 0
   for (let i = 1; i < elevations.length; i++) {
-    const delta = elevations[i] - elevations[i - 1]
-    if (delta > 0) ascent += delta
-    else descent += -delta
+    const diff = elevations[i] - elevations[i - 1]
+    if (diff > 0) ascent += diff
+    else descent += Math.abs(diff)
   }
-  return { ascent, descent }
+  return { ascent: Math.round(ascent), descent: Math.round(descent) }
 }
 
-async function extractErrorDetail(response: Response): Promise<string> {
+async function extractErrorDetail(response: Response): Promise<string | null> {
   try {
-    const body = await response.json()
-    return body?.error?.message ?? ''
+    const data = await response.json()
+    return (
+      data?.error?.message ??
+      data?.error?.detail ??
+      data?.message ??
+      (typeof data?.error === 'string' ? data.error : null)
+    )
   } catch {
-    return ''
+    return null
   }
 }

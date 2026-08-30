@@ -292,7 +292,7 @@ export default function SettingsForm({
 
           <div className="settings-row">
             <span>
-              Clé API openrouteservice
+              Clé API (optionnelle)
               <a
                 href="https://openrouteservice.org/dev/#/signup"
                 target="_blank"
@@ -306,7 +306,7 @@ export default function SettingsForm({
                 type={showApiKey ? 'text' : 'password'}
                 autoComplete="off"
                 spellCheck={false}
-                placeholder={envApiKey ? 'Configurée via .env (ou renseigner une autre clé)' : 'Clé API'}
+                placeholder="Optionnel : clé personnelle"
                 value={orsApiKey}
                 onChange={(e) => setOrsApiKey(e.target.value)}
               />
@@ -319,11 +319,9 @@ export default function SettingsForm({
                 {showApiKey ? <EyeOffIcon /> : <EyeIcon />}
               </button>
             </div>
-            {envApiKey && !orsApiKey && (
-              <p className="settings-group__hint" style={{ color: 'var(--primary)', marginTop: '2px' }}>
-                ✓ Clé par défaut active via .env (2 000 requêtes/jour)
-              </p>
-            )}
+            <p className="settings-group__hint" style={{ color: 'var(--text-muted)', marginTop: '2px' }}>
+              ✓ Serveur configuré avec 2 000 requêtes / jour. Renseigne une clé uniquement si tu souhaites utiliser ton propre compte ORS.
+            </p>
           </div>
         </div>
       </details>

@@ -10,8 +10,6 @@ import type { Settings } from '../types'
 import {
   ChevronLeftIcon,
   CloseIcon,
-  EyeIcon,
-  EyeOffIcon,
   PinIcon,
   RouteIcon,
   SearchIcon,
@@ -152,14 +150,12 @@ export default function Onboarding({ initialSettings, onComplete, onClose }: Onb
 
   // Settings state during onboarding
   const [heightCm, setHeightCm] = useState(initialSettings.heightCm || 170)
-  const [orsApiKey, setOrsApiKey] = useState(initialSettings.orsApiKey || '')
   const [defaultGoal, setDefaultGoal] = useState(initialSettings.defaultGoal || 10000)
   const [avoidHills, setAvoidHills] = useState(initialSettings.avoidHills || false)
   const [homeLat, setHomeLat] = useState<number | null>(initialSettings.homeLat)
   const [homeLng, setHomeLng] = useState<number | null>(initialSettings.homeLng)
 
-  // Step 2 & 4 states
-  const [showApiKey, setShowApiKey] = useState(false)
+  // Step 1 geocoding states
   const { loading: locating, error: geoError, locate } = useGeolocation()
   const [addressQuery, setAddressQuery] = useState('')
   const [addressResults, setAddressResults] = useState<AddressResult[]>([])
@@ -168,21 +164,13 @@ export default function Onboarding({ initialSettings, onComplete, onClose }: Onb
   const [selectedAddressLabel, setSelectedAddressLabel] = useState<string | null>(null)
   const mapRef = useRef<LeafletMap | null>(null)
 
-  const hasConfiguredKey = Boolean(
-    (import.meta.env.VITE_ORS_API_KEY as string | undefined)?.trim() ||
-      initialSettings.orsApiKey?.trim(),
-  )
+  const TOTAL_STEPS = 3
 
-  const TOTAL_STEPS = hasConfiguredKey ? 3 : 4
-
-  const stepTitles = hasConfiguredKey
-    ? ['Préparez vos marches', 'Point de départ', 'Profil de marche']
-    : [
-        'Préparez vos marches',
-        'Point de départ',
-        'Profil de marche',
-        'Calcul des trajets',
-      ]
+  const stepTitles = [
+    'Préparez vos marches',
+    'Point de départ',
+    'Profil de marche',
+  ]
 
   const goToStep = (nextStep: number) => {
     if (isTransitioning || nextStep === step) return
@@ -231,7 +219,7 @@ export default function Onboarding({ initialSettings, onComplete, onClose }: Onb
     setAddressError(null)
     setAddressResults([])
     try {
-      const results = await searchAddress(orsApiKey, addressQuery)
+      const results = await searchAddress(initialSettings.orsApiKey, addressQuery)
       if (results.length === 0) {
         setAddressError('Aucune adresse trouvée.')
       }
@@ -257,7 +245,7 @@ export default function Onboarding({ initialSettings, onComplete, onClose }: Onb
   const handleFinish = () => {
     onComplete({
       heightCm,
-      orsApiKey: orsApiKey.trim(),
+      orsApiKey: (initialSettings.orsApiKey || '').trim(),
       defaultGoal,
       avoidHills,
       homeLat,
@@ -561,89 +549,11 @@ export default function Onboarding({ initialSettings, onComplete, onClose }: Onb
                 type="button"
                 className="btn btn--primary btn--pill onboarding-cta-btn"
                 disabled={heightCm <= 0 || defaultGoal <= 0}
-                onClick={hasConfiguredKey ? handleFinish : () => goToStep(3)}
-              >
-                {hasConfiguredKey ? "C'est parti !" : 'Suivant'}
-              </button>
-              <button type="button" className="onboarding-ghost-link" onClick={() => goToStep(1)}>
-                Étape précédente
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 3: API Key & Ready */}
-        {step === 3 && (
-          <div className="onboarding-step-content" key="step-3">
-            <p className="onboarding-step-desc">
-              Pour calculer des tracés sur les vraies rues piétonnes, l'application utilise OpenRouteService.
-            </p>
-
-            <div className="onboarding-points">
-              <div className="onboarding-point">
-                <div className="onboarding-point__icon">
-                  <ShieldCheckIcon />
-                </div>
-                <p>
-                  <strong>100% Gratuit</strong> — 2 000 trajets piétons offerts par jour sans carte bancaire.
-                </p>
-              </div>
-
-              <div className="onboarding-point">
-                <div className="onboarding-point__icon">
-                  <TargetGoalIcon />
-                </div>
-                <p>
-                  <strong>Stockage local</strong> — Votre clé reste sur ce téléphone et n'est jamais partagée.
-                </p>
-              </div>
-            </div>
-
-            <div className="onboarding-form-card">
-              <div className="settings-row">
-                <span>
-                  Clé API OpenRouteService
-                  <a
-                    href="https://openrouteservice.org/dev/#/signup"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Créer une clé gratuite ↗
-                  </a>
-                </span>
-                <div className="settings-key">
-                  <input
-                    type={showApiKey ? 'text' : 'password'}
-                    autoComplete="off"
-                    spellCheck={false}
-                    placeholder="Ex: 5b3ce3597851110001cf6248..."
-                    value={orsApiKey}
-                    onChange={(e) => setOrsApiKey(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="settings-key__toggle"
-                    onClick={() => setShowApiKey((v) => !v)}
-                    aria-label={showApiKey ? 'Masquer la clé' : 'Afficher la clé'}
-                  >
-                    {showApiKey ? <EyeOffIcon /> : <EyeIcon />}
-                  </button>
-                </div>
-              </div>
-              <p className="settings-group__hint">
-                Vous pourrez aussi l'ajouter plus tard dans les réglages.
-              </p>
-            </div>
-
-            <div className="onboarding-bottom-actions">
-              <button
-                type="button"
-                className="btn btn--primary btn--pill onboarding-cta-btn"
                 onClick={handleFinish}
               >
                 C'est parti !
               </button>
-              <button type="button" className="onboarding-ghost-link" onClick={() => goToStep(2)}>
+              <button type="button" className="onboarding-ghost-link" onClick={() => goToStep(1)}>
                 Étape précédente
               </button>
             </div>

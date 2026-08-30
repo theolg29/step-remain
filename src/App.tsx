@@ -128,11 +128,6 @@ export default function App() {
     )
   }
 
-  const missingApiKey = !effectiveApiKey
-  const disabledReason = missingApiKey
-    ? 'Ajoute ta clé API openrouteservice dans les paramètres pour générer un trajet.'
-    : undefined
-
   const isAnyModalOpen = isSettingsOpen || isSavedRoutesOpen
 
   return (
@@ -175,8 +170,7 @@ export default function App() {
             defaultGoal={settings.defaultGoal}
             onGenerate={(distanceMeters) => runGeneration(distanceMeters)}
             isGenerating={isGenerating}
-            disabled={missingApiKey}
-            disabledReason={disabledReason}
+            disabled={false}
           />
           {(route || error) && (
             <RouteMap
