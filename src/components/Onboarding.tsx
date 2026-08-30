@@ -51,16 +51,16 @@ function RouteLineAnimation() {
       >
         <defs>
           <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#7df56c" />
-            <stop offset="100%" stopColor="#5ee44e" />
+            <stop offset="0%" stopColor="var(--primary)" />
+            <stop offset="100%" stopColor="var(--primary-2)" />
           </linearGradient>
         </defs>
 
         {/* Faint background road/track */}
         <path
           d={routePath}
-          stroke="rgba(125, 245, 108, 0.12)"
-          strokeWidth="5"
+          stroke="var(--track)"
+          strokeWidth="6"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -70,41 +70,41 @@ function RouteLineAnimation() {
           className="route-anim__path"
           d={routePath}
           stroke="url(#routeGrad)"
-          strokeWidth="2.8"
+          strokeWidth="3.2"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
 
         {/* Moving walker beacon dot along the route */}
-        <circle r="4.5" fill="#7df56c">
+        <circle r="4.8" fill="var(--primary)">
           <animateMotion dur="6s" repeatCount="indefinite" path={routePath} />
         </circle>
-        <circle r="1.8" fill="#061d18">
+        <circle r="2" fill="var(--primary-contrast)">
           <animateMotion dur="6s" repeatCount="indefinite" path={routePath} />
         </circle>
 
         {/* Home node marker */}
-        <circle cx="54" cy="96" r="9" fill="rgba(125, 245, 108, 0.2)" className="route-anim__pulse" />
-        <circle cx="54" cy="96" r="4.5" fill="#7df56c" />
-        <circle cx="54" cy="96" r="1.8" fill="#061d18" />
+        <circle cx="54" cy="96" r="9" fill="var(--primary)" opacity="0.25" className="route-anim__pulse" />
+        <circle cx="54" cy="96" r="4.8" fill="var(--primary)" />
+        <circle cx="54" cy="96" r="2" fill="var(--primary-contrast)" />
 
         {/* Clean floating badges */}
         <g transform="translate(24, 116)">
           <rect
             x="0"
             y="0"
-            width="68"
-            height="20"
-            rx="5"
-            fill="#0d2721"
-            stroke="#1a4238"
+            width="74"
+            height="22"
+            rx="6"
+            fill="var(--surface-2)"
+            stroke="var(--border)"
             strokeWidth="1"
           />
           <text
-            x="34"
-            y="14"
-            fill="#f1fbf4"
-            fontSize="9.5"
+            x="37"
+            y="15"
+            fill="var(--text)"
+            fontSize="10"
             fontWeight="700"
             letterSpacing="0.04em"
             textAnchor="middle"
@@ -114,23 +114,23 @@ function RouteLineAnimation() {
           </text>
         </g>
 
-        <g transform="translate(185, 16)">
+        <g transform="translate(180, 16)">
           <rect
             x="0"
             y="0"
-            width="112"
-            height="24"
-            rx="12"
-            fill="#0d2721"
-            stroke="#1a4238"
+            width="120"
+            height="26"
+            rx="13"
+            fill="var(--surface-2)"
+            stroke="var(--border)"
             strokeWidth="1"
           />
-          <circle cx="13" cy="12" r="3" fill="#7df56c" />
+          <circle cx="14" cy="13" r="3.5" fill="var(--primary)" />
           <text
-            x="62"
-            y="16"
-            fill="#7df56c"
-            fontSize="10.5"
+            x="66"
+            y="17"
+            fill="var(--primary)"
+            fontSize="11"
             fontWeight="700"
             textAnchor="middle"
             fontFamily="'Plus Jakarta Sans', sans-serif"

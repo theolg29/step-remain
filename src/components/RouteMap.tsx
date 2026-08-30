@@ -99,7 +99,7 @@ export default function RouteMap({
                   pathOptions={{
                     fillColor: 'var(--primary)',
                     fillOpacity: 1,
-                    color: '#061d18',
+                    color: 'var(--surface)',
                     weight: 2,
                   }}
                 />

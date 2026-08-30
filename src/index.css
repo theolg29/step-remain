@@ -1,26 +1,24 @@
 :root {
-  /* Palette "Trainline" : Vert Lime électrique (#7df56c) + Fond Nuit Pétrole (#061d18) */
-  --lime: #7df56c;
-  --lime-hover: #8eff7e;
-  --lime-contrast: #051b16;
+  /* Mode Sombre : Fond ardoise nuit émeraude & Vert athlétique vibrant */
+  --bg: #0b1512;
+  --stage-bg: #050b09;
+  --surface: #12211c;
+  --surface-2: #192e27;
+  --track: #243e34;
+  --text: #f0f7f4;
+  --text-muted: #8ba59a;
+  --border: #203930;
 
-  --bg: #061d18;
-  --stage-bg: #020b09;
-  --surface: #0d2721;
-  --surface-2: #14352d;
-  --track: #1d463c;
-  --text: #f1fbf4;
-  --text-muted: #8ba99d;
-  --border: #1a4238;
-  --primary: #7df56c;
-  --primary-2: #5ee44e;
-  --primary-contrast: #051b16;
-  --accent: #ff965b;
-  --accent-bg: rgba(255, 150, 91, 0.15);
-  --danger: #ff6b6b;
-  --danger-bg: rgba(255, 107, 107, 0.15);
-  --shadow: none;
-  --shadow-elevated: none;
+  --primary: #2fd573;
+  --primary-2: #22b35e;
+  --primary-contrast: #04180d;
+
+  --accent: #f59e0b;
+  --accent-bg: rgba(245, 158, 11, 0.15);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.35);
 
   --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
@@ -36,23 +34,26 @@
 
 @media (prefers-color-scheme: light) {
   :root {
-    --bg: #f4f8f5;
-    --stage-bg: #e2ece4;
+    /* Mode Clair : Fond frais & Vert Émeraude élégant & Contraste parfait */
+    --bg: #f7faf8;
+    --stage-bg: #e6ede8;
     --surface: #ffffff;
-    --surface-2: #edf5ee;
-    --track: #d8e7da;
-    --text: #061d18;
-    --text-muted: #516d62;
-    --border: #d4e5d7;
-    --primary: #127a48;
-    --primary-2: #7df56c;
+    --surface-2: #edf4ef;
+    --track: #dce7e0;
+    --text: #0e1e17;
+    --text-muted: #526f63;
+    --border: #dbe6df;
+
+    --primary: #15803d;
+    --primary-2: #166534;
     --primary-contrast: #ffffff;
-    --accent: #e86429;
-    --accent-bg: rgba(232, 100, 41, 0.12);
-    --danger: #d93838;
-    --danger-bg: rgba(217, 56, 56, 0.1);
-    --shadow: none;
-    --shadow-elevated: none;
+
+    --accent: #d97706;
+    --accent-bg: rgba(217, 119, 6, 0.12);
+    --danger: #dc2626;
+    --danger-bg: rgba(220, 38, 38, 0.1);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.08);
     color-scheme: light;
   }
 }
@@ -127,6 +128,16 @@ p {
 
 a {
   color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a.icon-button {
+  color: var(--text);
+  text-decoration: none;
 }
 
 /* --- Boutons partagés --- */
@@ -139,7 +150,7 @@ a {
   border-radius: 14px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: opacity 0.2s, border-color 0.2s, transform 0.15s;
+  transition: opacity 0.2s, border-color 0.2s, background-color 0.2s, transform 0.15s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -173,10 +184,11 @@ a {
 .btn--ghost {
   color: var(--text);
   background: var(--surface-2);
-  border-color: transparent;
+  border: 1px solid var(--border);
 }
 
 .btn--ghost:not(:disabled):hover {
+  background: var(--track);
   border-color: var(--primary);
 }
 
@@ -184,7 +196,7 @@ a {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: none;
+  border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
   display: flex;
@@ -192,11 +204,16 @@ a {
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.2s, transform 0.15s;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+}
+
+.icon-button svg {
+  color: currentColor;
 }
 
 .icon-button:hover {
   background: var(--track);
+  color: var(--text);
 }
 
 .icon-button:active {
@@ -236,6 +253,7 @@ a {
   padding: 10px 12px;
   border-radius: 14px;
   background: var(--surface-2);
+  border: 1px solid var(--border);
   flex: 1;
   min-width: 0;
 }

@@ -136,7 +136,7 @@
   border-top-right-radius: 28px;
   border: 1px solid var(--border);
   border-bottom: none;
-  box-shadow: none;
+  box-shadow: var(--shadow-elevated);
   transform: translateY(102%);
   transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
   z-index: 110;

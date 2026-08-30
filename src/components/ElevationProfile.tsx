@@ -20,10 +20,10 @@ interface PointData {
 }
 
 function getSlopeColor(slope: number): string {
-  if (slope >= 9) return '#ff3838' // Rouge vif (très raide)
-  if (slope >= 6) return '#ff6b4a' // Rouge-orangé (raide)
-  if (slope >= 3.5) return '#ffb338' // Orange/Ambre (modéré)
-  return '#7df56c' // Vert lime (plat / faux plat / descente)
+  if (slope >= 9) return '#ef4444' // Rouge vif (très raide)
+  if (slope >= 6) return '#f97316' // Orange-rouge (raide)
+  if (slope >= 3.5) return '#f59e0b' // Ambre / Orange (modéré)
+  return 'var(--primary)' // Vert émeraude harmonieux (plat / faux plat / descente)
 }
 
 function getSlopeLabel(slope: number): { text: string; prefix: string; color: string } {
@@ -31,8 +31,8 @@ function getSlopeLabel(slope: number): { text: string; prefix: string; color: st
   if (slope >= 9) return { text: 'Très raide', prefix: '↗', color }
   if (slope >= 6) return { text: 'Montée raide', prefix: '↗', color }
   if (slope >= 3.5) return { text: 'Montée', prefix: '↗', color }
-  if (slope <= -4) return { text: 'Descente', prefix: '↘', color: '#58c48c' }
-  return { text: 'Plat', prefix: '→', color: '#7df56c' }
+  if (slope <= -4) return { text: 'Descente', prefix: '↘', color: 'var(--primary-2)' }
+  return { text: 'Plat', prefix: '→', color: 'var(--primary)' }
 }
 
 export default function ElevationProfile({
@@ -223,7 +223,8 @@ export default function ElevationProfile({
                 y1={0}
                 x2={activePoint.x}
                 y2={90}
-                stroke="rgba(255, 255, 255, 0.3)"
+                stroke="var(--text-muted)"
+                strokeOpacity="0.4"
                 strokeDasharray="2 3"
                 strokeWidth="1"
               />
@@ -237,7 +238,7 @@ export default function ElevationProfile({
                 cx={activePoint.x}
                 cy={activePoint.y}
                 r="2"
-                fill="var(--bg)"
+                fill="var(--surface)"
               />
             </>
           )}
@@ -267,13 +268,13 @@ export default function ElevationProfile({
       {/* Légende rapide des couleurs de pente */}
       <div className="elevation-profile__legend">
         <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#7df56c' }} /> Plat / Faible (&lt; 3.5%)
+          <span className="legend-dot" style={{ background: 'var(--primary)' }} /> Plat / Faible (&lt; 3.5%)
         </span>
         <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#ffb338' }} /> Montée (3.5 - 6%)
+          <span className="legend-dot" style={{ background: '#f59e0b' }} /> Montée (3.5 - 6%)
         </span>
         <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#ff3838' }} /> Raide (&ge; 6%)
+          <span className="legend-dot" style={{ background: '#ef4444' }} /> Raide (&ge; 6%)
         </span>
       </div>
     </div>

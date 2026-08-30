@@ -53,13 +53,13 @@
 }
 
 .elevation-profile__max-slope--steep {
-  color: #ff4d4d;
-  border-color: rgba(255, 77, 77, 0.35);
-  background: rgba(255, 77, 77, 0.12);
+  color: var(--danger);
+  border-color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .elevation-profile__max-slope--steep strong {
-  color: #ff4d4d;
+  color: var(--danger);
 }
 
 .elevation-profile__chart {

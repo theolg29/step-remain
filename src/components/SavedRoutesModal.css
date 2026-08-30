@@ -167,7 +167,7 @@
 }
 
 .route-mode-badge--explore {
-  color: #5ee44e;
+  color: var(--primary);
 }
 
 .saved-route-card__stats {
